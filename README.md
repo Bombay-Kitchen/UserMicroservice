@@ -1,6 +1,5 @@
 # CampusConnect - Connect, Chat, and Share on Campus
 
----
 # UserModule
 User Module for CampusConnect - Independent Microservice for User Sign-In Sign-Up Functionality and Many User Based Features
 
@@ -13,7 +12,7 @@ Developed By Aditya Sunit Kanoi 👨‍💻
 
 CampusConnect is a versatile platform designed to foster connections among students on campus. It enables students to engage in real-time chat conversations, share posts, and build a vibrant campus community.
 
-![CampusConnect Logo](CampusConnectLogo.png)
+![CampusConnect Logo](CampusConnectBanner.png)
 
 ## Features
 
