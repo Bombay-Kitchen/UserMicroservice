@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.example.UserModule.config.SecurityConfig;
 import com.example.UserModule.properties.ApplicationProperties;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
