@@ -1,7 +1,6 @@
 package com.example.UserModule.controller;
 
 
-import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +11,6 @@ import com.example.UserModule.exceptions.CustomException;
 import com.example.UserModule.helper.UserModuleApiPath;
 import com.example.UserModule.service.serviceImpl.service.GeoIPLocationService;
 import com.example.UserModule.service.serviceImpl.service.UserService;
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
