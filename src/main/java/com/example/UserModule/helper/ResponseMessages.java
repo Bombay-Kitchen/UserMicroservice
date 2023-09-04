@@ -8,4 +8,6 @@ public interface ResponseMessages {
   String MAIL_SENT_FAILURE = "Error while Sending Mail";
   String ATTEMPTS_EXHAUSTED = "No Attempts Left Try Again After 12 Hours from Current Time";
   String AUTHENTICATION_ERROR = "Unable to Authorize the User Check Again !";
+  String INVALID_PASSWORD = "Password Not as per Valid Format";
+  String TRY_LOGIN = "Try Login";
 }

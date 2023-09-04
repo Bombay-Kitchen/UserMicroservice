@@ -6,7 +6,6 @@ import com.example.UserModule.helper.MessageStrings;
 import com.example.UserModule.dto.*;
 import com.example.UserModule.entity.AuthenticationToken;
 import com.example.UserModule.entity.UserTable;
-import com.example.UserModule.exceptions.AuthenticationFailException;
 import com.example.UserModule.exceptions.CustomException;
 import com.example.UserModule.helper.ResponseMessages;
 import com.example.UserModule.repo.TokenRepository;
@@ -27,16 +26,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.DatatypeConverter;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,11 +54,10 @@ public class UserServiceImplementation implements UserService {
   UserInsightsRepository userInsightsRepository;
   @Autowired
   private JavaMailSender javaMailSender;
+  @Autowired
+  private BCryptPasswordEncoder passwordEncoder;
   @Value("${spring.mail.username}")
   private String sender;
-  //  @Autowired
-  //  @Qualifier("fixedThreadPool")
-  //  private ExecutorService executorService;
   @Autowired
   GeoIPLocationService geoIPLocationService;
 
@@ -67,78 +65,102 @@ public class UserServiceImplementation implements UserService {
   Logger logger = LoggerFactory.getLogger(UserServiceImplementation.class);
 
   public SignUpResponseDto signUp(SignupDto signupDto) throws CustomException {
+    SignUpResponseDto signUpResponseDto = new SignUpResponseDto();
 
     // Check to see if the current email address has already been registered.
     if (Objects.nonNull(userRepository.findByEmail(signupDto.getEmail()))) {
       // If the email address has been registered then throw an exception.
-      return new SignUpResponseDto(ResponseMessages.EXISTING_USER, "Try Login");
+      return new SignUpResponseDto(ResponseMessages.EXISTING_USER, ResponseMessages.TRY_LOGIN, null);
     }
-
     // first encrypt the password
     String encryptedPassword = signupDto.getPassword();
-    try {
-      encryptedPassword = hashPassword(signupDto.getPassword());
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      logger.error("hashing password failed {}", e.getMessage());
-    }
+    encryptedPassword = hashPassword(signupDto.getPassword());
     UserTable user = new UserTable();
     BeanUtils.copyProperties(signupDto, user, signupDto.getPassword());
     user.setPassword(encryptedPassword);
-    try {
-      // save the User
-      userRepository.save(user);
-      // generate token for user
-      final AuthenticationToken authenticationToken = new AuthenticationToken(user);
-      // save token in database
-      authenticationService.saveConfirmationToken(authenticationToken);
 
-      UserInsights userInsights = new UserInsights(user);
-      userInsightsRepository.save(userInsights);
+    if (isValidPassword(signupDto.getPassword())) {
+      try {
+        // save the User
+        userRepository.save(user);
+        // generate token for user
+        final AuthenticationToken authenticationToken = new AuthenticationToken(user);
+        // save token in database
+        authenticationService.saveConfirmationToken(authenticationToken);
 
-      // success in creating
-      return new SignUpResponseDto(Constants.SUCCESS, ResponseMessages.USER_CREATED);
-    } catch (Exception e) {
+        UserInsights userInsights = new UserInsights(user);
+        userInsightsRepository.save(userInsights);
 
-      // handle signup error
-      throw new CustomException(e.getMessage());
+        signUpResponseDto.setStatus(Constants.SUCCESS);
+        signUpResponseDto.setMessage(ResponseMessages.USER_CREATED);
+        signUpResponseDto.setValidPassword(true);
+      } catch (Exception e) {
+        // handle signup error
+        throw new CustomException(e.getMessage());
+      }
+    } else {
+      signUpResponseDto.setStatus(Constants.FAILURE);
+      signUpResponseDto.setMessage(ResponseMessages.INVALID_PASSWORD);
+      signUpResponseDto.setValidPassword(false);
     }
+    return signUpResponseDto;
   }
 
-  private String hashPassword(String password) throws NoSuchAlgorithmException {
-    MessageDigest md = MessageDigest.getInstance("MD5");
-    md.update(password.getBytes());
-    byte[] digest = md.digest();
-    String myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
-    return myHash;
+  private static boolean isValidPassword(String password) {
+
+    // Regex to check valid password.
+    String regex = "^(?=.*[0-9])" + "(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#$%^&+=])" + "(?=\\S+$).{8,20}$";
+
+    // Compile the ReGex
+    Pattern p = Pattern.compile(regex);
+
+    // If the password is empty
+    // return false
+    if (password == null) {
+      return false;
+    }
+
+    // Pattern class contains matcher() method
+    // to find matching between given password
+    // and regular expression.
+    Matcher m = p.matcher(password);
+
+    // Return if the password
+    // matched the ReGex
+    return m.matches();
   }
 
-  public SignInResponseDto signIn(SignInDto signInDto) throws AuthenticationFailException, CustomException {
+  private String hashPassword(String password) {
+    String salt = BCrypt.gensalt();
+    String hashedPassword = BCrypt.hashpw(password, salt);
+    return hashedPassword;
+  }
+
+  public SignInResponseDto signIn(SignInDto signInDto) throws CustomException {
     // first find User by email
     UserTable user = userRepository.findByEmail(signInDto.getEmail());
 
     if (!Objects.nonNull(user)) {
       return new SignInResponseDto(ResponseMessages.USER_UNAVAILABLE, "Try Sign-UP !");
     }
-    try {
-      if (!user.getPassword().equals(hashPassword(signInDto.getPassword()))) {
-        return new SignInResponseDto(MessageStrings.WRONG_PASSWORD, "Wrong Password");
-      }
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      logger.error("hashing password failed {}", e.getMessage());
-      throw new CustomException(e.getMessage());
+
+    // Use BCrypt's built-in method to verify the password
+    if (!passwordEncoder.matches(signInDto.getPassword(), user.getPassword())) {
+      return new SignInResponseDto(MessageStrings.WRONG_PASSWORD, "Wrong Password");
     }
+
     AuthenticationToken token = authenticationService.getToken(user);
     if (!Objects.nonNull(token)) {
       // token not present
       throw new CustomException(MessageStrings.AUTH_TOKEN_NOT_PRESENT);
     }
+
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(() -> {
       updateLastLoginTime(user.getId(), new Date());
     });
     executorService.shutdown();
+
     return new SignInResponseDto(Constants.SUCCESS, token.getToken());
   }
 
@@ -182,22 +204,22 @@ public class UserServiceImplementation implements UserService {
 
   @Override
   public PasswordChangeResponseDto passwordChangeFunction(PasswordChangeDto passwordChangeDto) {
-    PasswordChangeResponseDto passwordChangeResponseDto = new PasswordChangeResponseDto();
+    if (!isValidPassword(passwordChangeDto.getNewPassword())) {
+      return PasswordChangeResponseDto.builder().response(ResponseMessages.INVALID_PASSWORD).update(false)
+          .token(passwordChangeDto.getUniqueTokenId()).build();
+    }
     try {
       UserTable user = authenticationService.getUser(passwordChangeDto.getUniqueTokenId());
       String hashedPassword = hashPassword(passwordChangeDto.getNewPassword());
       userRepository.updatePassword(user.getId(), hashedPassword);
-      passwordChangeResponseDto.setToken(passwordChangeDto.getUniqueTokenId());
-      passwordChangeResponseDto.setResponse("Password Changed Successfully !");
-      passwordChangeResponseDto.setUpdate(true);
+      return PasswordChangeResponseDto.builder().token(passwordChangeDto.getUniqueTokenId())
+          .response("Password Changed Successfully !").update(true).build();
     } catch (Exception e) {
       log.warn("Authentication Failed for User with Token : {} TimeStamp : {}", passwordChangeDto.getUniqueTokenId(),
           new Date());
-      passwordChangeResponseDto.setResponse(ResponseMessages.AUTHENTICATION_ERROR);
-      passwordChangeResponseDto.setToken(passwordChangeDto.getUniqueTokenId());
-      passwordChangeResponseDto.setUpdate(false);
+      return PasswordChangeResponseDto.builder().token(passwordChangeDto.getUniqueTokenId())
+          .response(ResponseMessages.AUTHENTICATION_ERROR).update(false).build();
     }
-    return passwordChangeResponseDto;
   }
 
 
