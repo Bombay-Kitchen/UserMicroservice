@@ -54,4 +54,16 @@ public interface UserInsightsRepository extends JpaRepository<UserInsights, Inte
   @Transactional
   @Query("UPDATE UserInsights ui SET ui.passwordResetAttempts = ui.passwordResetAttempts - 1 WHERE ui.id = :id")
   void reducePasswordAttempts(@Param("id") Integer id);
+
+  /**
+   * @param id
+   * @param location
+   * @param device
+   */
+  @Modifying
+  @Transactional
+  @Query("UPDATE UserInsights ui SET ui.location = :location, ui.device = :device WHERE ui.id = :id")
+  void updateLocationAndDeviceInformation(@Param("id") Integer id, @Param("location") String location,
+      @Param("device") String device);
+
 }

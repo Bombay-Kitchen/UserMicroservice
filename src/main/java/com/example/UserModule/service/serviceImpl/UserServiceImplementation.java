@@ -13,7 +13,9 @@ import com.example.UserModule.repo.UserInsightsRepository;
 import com.example.UserModule.repo.UserTableRepository;
 import com.example.UserModule.service.serviceImpl.service.GeoIPLocationService;
 import com.example.UserModule.service.serviceImpl.service.UserService;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -37,6 +39,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,6 +110,7 @@ public class UserServiceImplementation implements UserService {
     return signUpResponseDto;
   }
 
+
   private static boolean isValidPassword(String password) {
 
     // Regex to check valid password.
@@ -136,9 +141,10 @@ public class UserServiceImplementation implements UserService {
     return hashedPassword;
   }
 
-  public SignInResponseDto signIn(SignInDto signInDto) throws CustomException {
+  public SignInResponseDto signIn(SignInDto signInDto, String ip, HttpServletRequest request) throws CustomException {
     // first find User by email
     UserTable user = userRepository.findByEmail(signInDto.getEmail());
+    GeoIP geoIP = new GeoIP();
 
     if (!Objects.nonNull(user)) {
       return new SignInResponseDto(ResponseMessages.USER_UNAVAILABLE, "Try Sign-UP !");
@@ -161,6 +167,16 @@ public class UserServiceImplementation implements UserService {
     });
     executorService.shutdown();
 
+
+    try {
+      geoIP = geoIPLocationService.getIpLocation(ip, request);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (GeoIp2Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    userInsightsRepository.updateLocationAndDeviceInformation(user.getId(), geoIP.getFullLocation(), geoIP.getDevice());
     return new SignInResponseDto(Constants.SUCCESS, token.getToken());
   }
 

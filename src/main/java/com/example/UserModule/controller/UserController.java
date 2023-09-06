@@ -9,7 +9,6 @@ import com.example.UserModule.dto.*;
 import com.example.UserModule.exceptions.AuthenticationFailException;
 import com.example.UserModule.exceptions.CustomException;
 import com.example.UserModule.helper.UserModuleApiPath;
-import com.example.UserModule.service.serviceImpl.service.GeoIPLocationService;
 import com.example.UserModule.service.serviceImpl.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
   @Autowired
   UserService userService;
-  @Autowired
-  GeoIPLocationService geoIPLocationService;
 
   @Operation(description = "API ENDPOINT FOR SIGN-UP")
   @PostMapping(UserModuleApiPath.SIGN_UP)
-  public ResponseEntity<SignInResponseDto> Signup(@RequestBody SignupDto signupDto) throws CustomException {
+  public ResponseEntity<SignUpResponseDto> Signup(@RequestBody SignupDto signupDto) throws CustomException {
     log.warn("Invoking API for Sign-Up with UserName : {} and UserEmail : {}", signupDto.getFirstName(),
         signupDto.getEmail());
     return new ResponseEntity(userService.signUp(signupDto), HttpStatus.OK);
@@ -41,10 +38,11 @@ public class UserController {
 
   @Operation(description = "API ENDPOINT FOR SIGN-IN")
   @PostMapping(UserModuleApiPath.SIGN_IN)
-  public ResponseEntity<SignInResponseDto> SignIn(@RequestBody SignInDto signInDto)
+  public ResponseEntity<SignInResponseDto> SignIn(@RequestBody SignInDto signInDto,
+      @RequestParam(required = false) String ip, HttpServletRequest request)
       throws CustomException, AuthenticationFailException {
     log.warn("Invoking API for Sign-In with UserEmail : {}", signInDto.getEmail());
-    return new ResponseEntity<>(userService.signIn(signInDto), HttpStatus.OK);
+    return new ResponseEntity<>(userService.signIn(signInDto, ip, request), HttpStatus.OK);
   }
 
   @Operation(description = "API ENDPOINT FOR RESET_PASSWORD_LINK")
