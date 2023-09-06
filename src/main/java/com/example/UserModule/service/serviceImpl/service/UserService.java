@@ -1,6 +1,8 @@
 package com.example.UserModule.service.serviceImpl.service;
 
-import com.example.UserModule.dto.EmailDetails;
+import javax.servlet.http.HttpServletRequest;
+
+
 import com.example.UserModule.dto.PasswordChangeDto;
 import com.example.UserModule.dto.PasswordChangeResponseDto;
 import com.example.UserModule.dto.PasswordResetLinkDto;
@@ -21,11 +23,13 @@ public interface UserService {
 
   /**
    * @param signInDto
+   * @param request
    * @return
    * @throws AuthenticationFailException
    * @throws CustomException
    */
-  public SignInResponseDto signIn(SignInDto signInDto) throws AuthenticationFailException, CustomException;
+  public SignInResponseDto signIn(SignInDto signInDto, String ip, HttpServletRequest request)
+      throws AuthenticationFailException, CustomException;
 
   /**
    * @param email
