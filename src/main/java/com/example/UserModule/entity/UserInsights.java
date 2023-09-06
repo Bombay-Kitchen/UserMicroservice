@@ -58,5 +58,6 @@ public class UserInsights {
     this.user = user;
     this.accountCreationDate = new Date();
     this.passwordResetAttempts = Constants.PASSWORD_ATTEMPTS;
+    this.firstLoginDate = null;
   }
 }

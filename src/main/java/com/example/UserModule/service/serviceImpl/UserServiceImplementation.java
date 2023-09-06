@@ -147,12 +147,12 @@ public class UserServiceImplementation implements UserService {
     GeoIP geoIP = new GeoIP();
 
     if (!Objects.nonNull(user)) {
-      return new SignInResponseDto(ResponseMessages.USER_UNAVAILABLE, "Try Sign-UP !");
+      return new SignInResponseDto(ResponseMessages.USER_UNAVAILABLE, MessageStrings.TRY_SIGN_UP_TOKEN);
     }
 
     // Use BCrypt's built-in method to verify the password
     if (!passwordEncoder.matches(signInDto.getPassword(), user.getPassword())) {
-      return new SignInResponseDto(MessageStrings.WRONG_PASSWORD, "Wrong Password");
+      return new SignInResponseDto(MessageStrings.WRONG_PASSWORD, MessageStrings.WRONG_PASSWORD_TOKEN);
     }
 
     AuthenticationToken token = authenticationService.getToken(user);
@@ -175,13 +175,19 @@ public class UserServiceImplementation implements UserService {
     } catch (GeoIp2Exception e) {
       throw new RuntimeException(e);
     }
-
+    updateFirstLoginTime(user.getId(), new Date());
     userInsightsRepository.updateLocationAndDeviceInformation(user.getId(), geoIP.getFullLocation(), geoIP.getDevice());
     return new SignInResponseDto(Constants.SUCCESS, token.getToken());
   }
 
   private void updateLastLoginTime(Integer userId, Date dateTime) {
     userInsightsRepository.updateLastLoginDate(userId, dateTime);
+  }
+
+  private void updateFirstLoginTime(Integer userId, Date dateTime) {
+    if (userInsightsRepository.getFirstLoginDateUsingId(userId) == null) {
+      userInsightsRepository.updateFirstLoginDate(userId, dateTime);
+    }
   }
 
   @Override
