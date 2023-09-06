@@ -66,4 +66,11 @@ public interface UserInsightsRepository extends JpaRepository<UserInsights, Inte
   void updateLocationAndDeviceInformation(@Param("id") Integer id, @Param("location") String location,
       @Param("device") String device);
 
+  @Modifying
+  @Transactional
+  @Query("UPDATE UserInsights ui SET ui.firstLoginDate = :firstLoginDate WHERE ui.id = :id")
+  void updateFirstLoginDate(@Param("id") Integer id, @Param("firstLoginDate") Date firstLoginDate);
+
+  @Query("SELECT ui.firstLoginDate FROM UserInsights ui WHERE ui.id = :id")
+  Date getFirstLoginDateUsingId(@Param("id") Integer id);
 }
