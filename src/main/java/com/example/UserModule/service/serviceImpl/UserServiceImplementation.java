@@ -8,6 +8,7 @@ import com.example.UserModule.entity.AuthenticationToken;
 import com.example.UserModule.entity.UserTable;
 import com.example.UserModule.exceptions.CustomException;
 import com.example.UserModule.helper.ResponseMessages;
+import com.example.UserModule.helper.UserActivity;
 import com.example.UserModule.repo.TokenRepository;
 import com.example.UserModule.repo.UserInsightsRepository;
 import com.example.UserModule.repo.UserTableRepository;
@@ -17,6 +18,7 @@ import com.maxmind.geoip2.exception.GeoIp2Exception;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -27,13 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Scheduled;
+
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -41,6 +43,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,6 +114,26 @@ public class UserServiceImplementation implements UserService {
   }
 
 
+  private boolean USNValidAndWithinActiveYear(String usn) {
+    // Define the regular expression pattern for USN format
+    final String USN_PATTERN = "^\\d{1}[A-Z]{2}\\d{2}[A-Z]{2}\\d{3}$";
+    // Check if the USN format matches the pattern
+    if (!Pattern.matches(USN_PATTERN, usn)) {
+      return false;
+    }
+    // Extract the year portion from the USN (e.g., "19" from "1NH19IS009")
+    int year = Integer.parseInt(usn.substring(3, 5));
+    // Get the current year
+    int currentYear = Year.now().getValue();
+    // Calculate the active year range
+    int activeYearStart = currentYear - 4;
+    int activeYearEnd = currentYear;
+    // Check if the year falls within the active range
+    boolean isWithinActiveYearRange = year >= (activeYearStart % 100) && year <= (activeYearEnd % 100);
+    return isWithinActiveYearRange;
+  }
+
+
   private static boolean isValidPassword(String password) {
 
     // Regex to check valid password.
@@ -177,6 +200,7 @@ public class UserServiceImplementation implements UserService {
     }
     updateFirstLoginTime(user.getId(), new Date());
     userInsightsRepository.updateLocationAndDeviceInformation(user.getId(), geoIP.getFullLocation(), geoIP.getDevice());
+    userInsightsRepository.updateLiveUserFlag(user.getId(), USNValidAndWithinActiveYear(user.getUsn()));
     return new SignInResponseDto(Constants.SUCCESS, token.getToken());
   }
 
@@ -244,12 +268,57 @@ public class UserServiceImplementation implements UserService {
     }
   }
 
+  @Override
+  public AccountDeletionResponseDto accountDeletionFunction(String authenticationToken) {
+    AccountDeletionResponseDto accountDeletionResponseDto = new AccountDeletionResponseDto();
+    try {
+      UserTable user = authenticationService.getUser(authenticationToken);
+      deleteUserAndRelatedRecords(user.getId());
+      accountDeletionResponseDto.setAccountDeleted(true);
+      accountDeletionResponseDto.setResponse("Account Deleted Successfully !");
+    } catch (Exception e) {
+      accountDeletionResponseDto.setAccountDeleted(false);
+      accountDeletionResponseDto.setResponse("User Not Found !");
+    }
+    return accountDeletionResponseDto;
+  }
 
-  @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Kolkata")
-  public void resetAttempts() {
-    List<UserTable> users = userRepository.findAll();
-    List<Integer> ids = users.stream().map(UserTable::getId).collect(Collectors.toList());
-    userInsightsRepository.updatePasswordResetAttempts(ids, Constants.PASSWORD_ATTEMPTS);
+  @Override
+  public AccountDeactivationResponseDto accountActivationDeactivationFunction(String authenticationToken,
+      String action) {
+    AccountDeactivationResponseDto accountDeactivationResponseDto = new AccountDeactivationResponseDto();
+    UserTable user = authenticationService.getUser(authenticationToken);
+
+    // Get the UserInsights directly without using Optional
+    UserInsights userInsights = userInsightsRepository.findById(user.getId())
+        .orElseGet(() -> new UserInsights(user)); // Create new UserInsights if not found
+
+    if (userInsights.getUserActivity().equals(action)) {
+      accountDeactivationResponseDto.setAccountDeactivated(false);
+      accountDeactivationResponseDto.setResponse(ResponseMessages.ACCOUNT_ALREADY_DEACTIVATED);
+    } else {
+      userInsightsRepository.updateUserActivity(user.getId(), action);
+      accountDeactivationResponseDto.setAccountDeactivated(true);
+      if (action.equals(UserActivity.DEACTIVATED_ACCOUNT.getName())) {
+        accountDeactivationResponseDto.setResponse(ResponseMessages.ACCOUNT_DEACTIVATED);
+      } else if (action.equals(UserActivity.ACTIVE.getName())) {
+        accountDeactivationResponseDto.setResponse(ResponseMessages.ACCOUNT_ACTIVATED);
+      }
+    }
+    return accountDeactivationResponseDto;
+  }
+
+
+  @Transactional
+  private void deleteUserAndRelatedRecords(Integer userId) {
+    // Delete related records in AuthenticationToken
+    userRepository.deleteRelatedRecordsInAuthenticationToken(userId);
+
+    // Delete related records in SellerInsights
+    userRepository.deleteRelatedRecordsInUserInsights(userId);
+
+    // Delete the user from UserTable
+    userRepository.deleteUserAndRelatedRecords(userId);
   }
 
   private String sendSimpleMail(EmailDetails details) {

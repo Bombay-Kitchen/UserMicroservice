@@ -28,4 +28,28 @@ public interface UserTableRepository extends JpaRepository<UserTable, Integer> {
   @Query("UPDATE UserTable ut SET ut.password = :newPassword WHERE ut.id = :id")
   void updatePassword(@Param("id") Integer id, @Param("newPassword") String newPassword);
 
+  /**
+   * @param userId
+   */
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM AuthenticationToken at WHERE at.user.id = :userId")
+  void deleteRelatedRecordsInAuthenticationToken(@Param("userId") Integer userId);
+
+  /**
+   * @param userId
+   */
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM UserInsights si WHERE si.user.id = :userId")
+  void deleteRelatedRecordsInUserInsights(@Param("userId") Integer userId);
+
+  /**
+   * @param userId
+   */
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM UserTable ut WHERE ut.id = :userId")
+  void deleteUserAndRelatedRecords(@Param("userId") Integer userId);
+
 }

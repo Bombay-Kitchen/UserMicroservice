@@ -3,6 +3,8 @@ package com.example.UserModule.service.serviceImpl.service;
 import javax.servlet.http.HttpServletRequest;
 
 
+import com.example.UserModule.dto.AccountDeactivationResponseDto;
+import com.example.UserModule.dto.AccountDeletionResponseDto;
 import com.example.UserModule.dto.PasswordChangeDto;
 import com.example.UserModule.dto.PasswordChangeResponseDto;
 import com.example.UserModule.dto.PasswordResetLinkDto;
@@ -42,5 +44,20 @@ public interface UserService {
    * @return
    */
   public PasswordChangeResponseDto passwordChangeFunction(PasswordChangeDto passwordChangeDto);
+
+  /**
+   * @param authenticationToken
+   * @return
+   */
+  public AccountDeletionResponseDto accountDeletionFunction(String authenticationToken);
+
+
+  /**
+   * @param authenticationToken
+   * @param action
+   * @return
+   */
+  public AccountDeactivationResponseDto accountActivationDeactivationFunction(String authenticationToken,
+      String action);
 
 }

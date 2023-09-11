@@ -10,4 +10,7 @@ public interface ResponseMessages {
   String AUTHENTICATION_ERROR = "Unable to Authorize the User Check Again !";
   String INVALID_PASSWORD = "Password Not as per Valid Format";
   String TRY_LOGIN = "Try Login";
+  String ACCOUNT_DEACTIVATED = "Account Deactivated";
+  String ACCOUNT_ALREADY_DEACTIVATED = "Account Already Deactivated";
+  String ACCOUNT_ACTIVATED = "Account Activated";
 }
