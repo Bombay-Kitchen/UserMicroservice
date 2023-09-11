@@ -61,4 +61,22 @@ public class UserController {
     PasswordChangeResponseDto passwordChangeResponseDto = userService.passwordChangeFunction(passwordChangeDto);
     return new ResponseEntity<>(passwordChangeResponseDto, HttpStatus.OK);
   }
+
+  @Operation(description = "API ENDPOINT FOR DELETION OF ACCOUNT")
+  @DeleteMapping(UserModuleApiPath.DELETE_USER_ACCOUNT)
+  public ResponseEntity<AccountDeletionResponseDto> AccountDeletion(@RequestParam String authenticationToken) {
+    log.warn("Invoking API for Deletion of User Account at Time : {}", new Date());
+    AccountDeletionResponseDto accountDeletionResponseDto = userService.accountDeletionFunction(authenticationToken);
+    return new ResponseEntity<>(accountDeletionResponseDto, HttpStatus.OK);
+  }
+
+  @Operation(description = "API ENDPOINT FOR DEACTIVATION OF ACCOUNT")
+  @PutMapping(UserModuleApiPath.DEACTIVATE_USER_ACCOUNT)
+  public ResponseEntity<AccountDeactivationResponseDto> AccountDeactivation(@RequestParam String authenticationToken,
+      String action) {
+    log.warn("Invoking API for Deactivation of User Account at Time : {}", new Date());
+    AccountDeactivationResponseDto accountDeactivationResponseDto =
+        userService.accountActivationDeactivationFunction(authenticationToken, action);
+    return new ResponseEntity<>(accountDeactivationResponseDto, HttpStatus.OK);
+  }
 }

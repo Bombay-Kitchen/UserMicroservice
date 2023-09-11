@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 
 import com.example.UserModule.helper.Constants;
+import com.example.UserModule.helper.UserActivity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,10 +55,18 @@ public class UserInsights {
   @Column(name = "password_reset_attempts")
   private int passwordResetAttempts;
 
+  @Column(name = "live_user_flag")
+  private boolean userLiveFlag;
+
+  @Column(name = "user_activity")
+  private String userActivity;
+
+
   public UserInsights(UserTable user) {
     this.user = user;
     this.accountCreationDate = new Date();
     this.passwordResetAttempts = Constants.PASSWORD_ATTEMPTS;
     this.firstLoginDate = null;
+    this.userActivity = UserActivity.FRESH.getName();
   }
 }

@@ -6,4 +6,6 @@ public interface UserModuleApiPath {
   String SIGN_IN = "Sign-In";
   String RESET_PASSWORD_LINK = "Reset-Password-Link";
   String UPDATE_PASSWORD = "Update-Password";
+  String DELETE_USER_ACCOUNT = "Delete-User-Account";
+  String DEACTIVATE_USER_ACCOUNT = "Deactivate-User-Account";
 }
