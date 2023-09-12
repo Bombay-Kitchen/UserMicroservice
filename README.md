@@ -14,6 +14,77 @@ CampusConnect is a versatile platform designed to foster connections among stude
 
 ![CampusConnect Logo](CampusConnectBanner.png)
 
+
+# API Documentation
+
+This document provides information about the API endpoints for our application.
+
+## Sign-Up API
+
+**Description**: This API endpoint allows users to sign up for the application by providing their registration information.
+
+- **HTTP Method**: POST
+- **Path**: `UserModuleApiPath.SIGN_UP`
+- **Request Body**: 
+  - `firstName` (String): User's first name.
+  - `email` (String): User's email address.
+  - (Other registration fields as needed)
+- **Response**: A JSON response containing signup details.
+
+## Sign-In API
+
+**Description**: This API endpoint allows users to sign in to the application by providing their credentials.
+
+- **HTTP Method**: POST
+- **Path**: `UserModuleApiPath.SIGN_IN`
+- **Request Body**:
+  - `email` (String): User's email address.
+  - `password` (String): User's password.
+- **Response**: A JSON response containing sign-in details.
+
+## Password Reset Link API
+
+**Description**: This API endpoint allows users to request a password reset link by providing their email address.
+
+- **HTTP Method**: POST
+- **Path**: `UserModuleApiPath.RESET_PASSWORD_LINK`
+- **Request Parameters**:
+  - `email` (String): The email address for which the reset link is requested.
+- **Response**: A JSON response containing a password reset link.
+
+## Change of Password API
+
+**Description**: This API endpoint allows users to change their password.
+
+- **HTTP Method**: PUT
+- **Path**: `UserModuleApiPath.UPDATE_PASSWORD`
+- **Request Body**:
+  - `email` (String): User's email address.
+  - `oldPassword` (String): User's current password.
+  - `newPassword` (String): User's new password.
+- **Response**: A JSON response indicating the status of the password change request.
+
+## Deletion of Account API
+
+**Description**: This API endpoint allows users to delete their accounts.
+
+- **HTTP Method**: DELETE
+- **Path**: `UserModuleApiPath.DELETE_USER_ACCOUNT`
+- **Request Parameter**:
+  - `authenticationToken` (String): The user's authentication token for account verification.
+- **Response**: A JSON response indicating the status of the account deletion request.
+
+## Deactivation of Account API
+
+**Description**: This API endpoint allows users to deactivate or reactivate their accounts.
+
+- **HTTP Method**: PUT
+- **Path**: `UserModuleApiPath.DEACTIVATE_USER_ACCOUNT`
+- **Request Parameters**:
+  - `authenticationToken` (String): The user's authentication token for account verification.
+  - `action` (String): A string indicating whether to deactivate or reactivate the account.
+- **Response**: A JSON response indicating the status of the account deactivation/reactivation request.
+
 ## Features
 
 📢 **Real-time Chat**: Connect with fellow students through instant messaging within the campus.
