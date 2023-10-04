@@ -169,6 +169,9 @@ Thank you for being a part of the CampusConnect community! 😊
 - [ ] 🎓 **Alumni Network**
   Connect with alumni to gain insights and career advice.
 
+- [ ] 🎓 **Rèsume Digital Badges**
+  Get Sharable and Digital Badges on the Basis of Resume also steps to Improve your Resume and QR Code for Quick Resume Share.
+
 Stay tuned for these exciting updates! 🔥💯🚀
 
 Feel free to reach out if you have any suggestions or questions in CampusConnect Project Chat. We're committed to enhancing your campus experience. Happy connecting on CampusConnect! 😄📚🎉
