@@ -4,8 +4,8 @@ SIGN UP
 2> Non Suncity Based Login 
 
 - Note
-Dont Allow Anyone to Signup Outisde Banglore City Limits
-When user Selects Non Sunicity Based - Set a small message saying that Delivery Charges Applicable 
+Don't Allow Anyone to Signup Outside Banglore City Limits
+When user Selects Non SuniCity Based - Set a small message saying that Delivery Charges Applicable 
 When User Selects Suncity Based put Message that Free Delivery
 
 - Suncity Based SignUp 
@@ -27,7 +27,7 @@ Address Lane / Street
 Area 
 City - Banglore (HardCoded)
 
-- Actionables 
+- Actionable 
 
 Allow to Connect Google Account In Profile Section
 Allow Them to Make Edits in Profile 
