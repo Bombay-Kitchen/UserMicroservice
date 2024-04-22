@@ -90,17 +90,15 @@ This document provides information about the API endpoints for our application.
 
 1. Clone the repository to your local machine.
 2. Run the application using your preferred IDE or by following the provided setup instructions.
-3. Access the CampusConnect application via the web browser.
+3. Access the Bombay Kitchen application via the web browser.
 
 ## Endpoints
 
-Access the CampusConnect application through the provided web interface to explore its features and functionalities.
+Access the Bombay Kitchen application through the provided web interface to explore its features and functionalities.
 
 ### 1. Explore User Profiles
 
-- **Description**: View and customize your user profile with interests, majors, and more.
-- **Usage**: Access your profile settings and interact with others based on shared interests.
-- **Benefits**: Build connections with like-minded individuals on campus.
+- **Description**: View and customize your user profile with Addresses .
 
 ## Performance
 
@@ -108,12 +106,12 @@ Access the CampusConnect application through the provided web interface to explo
 
 ## How to Contribute
 
-Contributions to CampusConnect are highly encouraged! If you have ideas for improvements, features, or bug fixes, please don't hesitate to get involved.
+Contributions to Bombay Kitchen are highly encouraged! If you have ideas for improvements, features, or bug fixes, please don't hesitate to get involved.
 
-🌟 Please star the repository if you find CampusConnect helpful!
+🌟 Please star the repository if you find Bombay Kitchen helpful!
 
-Thank you for being a part of the CampusConnect community! 😊
+Thank you for being a part of the Bombay Kitchen community! 😊
 
 ---
 
-Feel free to reach out if you have any suggestions or questions in CampusConnect Project Chat. We're committed to enhancing your User experience. Happy connecting on Bombay-Kitchen ! 😄📚🎉
+Feel free to reach out if you have any suggestions or questions in Bombay Kitchen Project Chat. We're committed to enhancing your User experience. Happy connecting on Bombay-Kitchen ! 😄📚🎉

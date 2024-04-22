@@ -222,7 +222,7 @@ public class UserServiceImplementation implements UserService {
 
     EmailDetails emailDetails = new EmailDetails();
     emailDetails.setRecipient(email);
-    emailDetails.setSubject("Password Reset Token - CampusConnect");
+    emailDetails.setSubject("Password Reset Token - Bombay Kitchen");
     emailDetails.setMsgBody("The User Token for Password Reset is : " + userToken);
     PasswordResetLinkDto passwordResetLinkDto = new PasswordResetLinkDto();
     passwordResetLinkDto.setResponseMessage("Authentication Token Sent Successfully");

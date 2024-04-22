@@ -1,14 +1,14 @@
-SIGN UP 
+SIGN UP Documentation
 
-1> Suncity Based Login  
-2> Non Suncity Based Login 
+1> SunCity Based Login
+2> Non SunCity Based Login
 
 - Note
-Don't Allow Anyone to Signup Outside Banglore City Limits
-When user Selects Non SuniCity Based - Set a small message saying that Delivery Charges Applicable 
-When User Selects Suncity Based put Message that Free Delivery
+Don't Allow Anyone to Signup Outside Bangalore City Limits
+When user Selects Non SunCity Based - Set a small message saying that Delivery Charges Applicable
+When User Selects SunCity Based put Message that Free Delivery
 
-- Suncity Based SignUp 
+- SunCity Based SignUp
 
 Avatar (Optional) (Default) - 5 Avatars
 Phone Number (Compulsory)
@@ -20,12 +20,12 @@ Floor(Auto Fill)
 Block Number + Apartment Name (Dropdown)
 Cluster (Auto Fill)
 
-- Non Suncity Based Signup 
+- Non SunCity Based Signup
 
 Flat Number/House Number , Building 
 Address Lane / Street 
 Area 
-City - Banglore (HardCoded)
+City - Bangalore (HardCoded)
 
 - Actionable 
 

@@ -12,7 +12,7 @@
 	<artifactId>UserModule</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>UserModule</name>
-	<description>Registration and Login Module for Campus Connect</description>
+	<description>Registration and Login Module for Bombay Kitchen Users</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -41,6 +41,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.30</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
